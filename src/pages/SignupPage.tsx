@@ -137,6 +137,24 @@ export const SignupPage = () => {
               </div>
             )}
           </div>
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant={role === 'student' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => setRole('student')}
+            >
+              Student
+            </Button>
+            <Button
+              type="button"
+              variant={role === 'professor' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => setRole('professor')}
+            >
+              Professor
+            </Button>
+          </div>
           <div>
             <Button type="submit" className="w-full">Sign up</Button>
           </div>

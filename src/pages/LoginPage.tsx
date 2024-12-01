@@ -7,21 +7,19 @@ import { useAuthStore } from '../store/auth';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
+  const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'student' | 'professor'>('student');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would make an API call
-    setUser({
-      id: '1',
-      name: 'Test User',
-      email,
-      role,
-    });
-    navigate(role === 'student' ? '/student' : '/professor');
+    try {
+      await login(email, password);
+      navigate(role === 'student' ? '/student' : '/professor');
+    } catch (error) {
+      alert('Login failed');
+    }
   };
 
   return (
@@ -33,63 +31,56 @@ export const LoginPage = () => {
             Sign in to your account
           </h2>
         </div>
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+          <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+              <label htmlFor="email" className="sr-only">Email address</label>
               <Input
+                id="email"
+                name="email"
                 type="email"
                 required
+                placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <Input
+                id="password"
+                name="password"
                 type="password"
                 required
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant={role === 'student' ? 'default' : 'outline'}
-                className="flex-1"
-                onClick={() => setRole('student')}
-              >
-                Student
-              </Button>
-              <Button
-                type="button"
-                variant={role === 'professor' ? 'default' : 'outline'}
-                className="flex-1"
-                onClick={() => setRole('professor')}
-              >
-                Professor
-              </Button>
-            </div>
           </div>
-
-          <div>
-            <Button type="submit" className="w-full">
-              Sign in
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant={role === 'student' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => setRole('student')}
+            >
+              Student
+            </Button>
+            <Button
+              type="button"
+              variant={role === 'professor' ? 'default' : 'outline'}
+              className="flex-1"
+              onClick={() => setRole('professor')}
+            >
+              Professor
             </Button>
           </div>
-
-          <div className="text-center text-sm">
-            <Link to="/signup" className="text-blue-600 hover:underline">
-              Don't have an account? Sign up
-            </Link>
+          <div>
+            <Button type="submit" className="w-full">Sign in</Button>
+          </div>
+          <div className="text-sm text-center">
+            Don't have an account? <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">Sign up</Link>
           </div>
         </form>
       </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Download } from 'lucide-react';
 import { format } from 'date-fns';
@@ -36,119 +36,28 @@ const RequestStages = ({ request }: { request: Request }) => {
     }
   };
 
-  const stages = [
-    { label: 'Submitted', date: request.createdAt },
-    {
-      label: 'Professor Review',
-      date: request.professorApproval?.date,
-      remarks: request.professorApproval?.remarks,
-    },
-    {
-      label: 'HOD Review',
-      date: request.hodApproval?.date,
-      remarks: request.hodApproval?.remarks,
-    },
-  ];
-
   return (
-    <div className="mt-8">
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300" />
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getStageColor(getStageStatus(1))}`}>
+            {getStageStatus(1) === 'completed' ? '✓' : 1}
+          </div>
+          <span>Submitted</span>
         </div>
-        <div className="relative flex justify-between">
-          {stages.map((stage, index) => {
-            const status = getStageStatus(index + 1);
-            return (
-              <div key={stage.label} className="text-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ${getStageColor(
-                    status
-                  )} mx-auto text-white`}
-                >
-                  {status === 'completed' ? '✓' : index + 1}
-                </div>
-                <div className="mt-2 text-sm font-medium">{stage.label}</div>
-                {stage.date && (
-                  <div className="mt-1 text-xs text-gray-500">
-                    {format(new Date(stage.date), 'MMM d, yyyy')}
-                  </div>
-                )}
-                {stage.remarks && (
-                  <div className="mt-1 text-xs text-gray-600 max-w-[200px] mx-auto">
-                    "{stage.remarks}"
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getStageColor(getStageStatus(2))}`}>
+            {getStageStatus(2) === 'completed' ? '✓' : 2}
+          </div>
+          <span>Professor Approval</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getStageColor(getStageStatus(3))}`}>
+            {getStageStatus(3) === 'completed' ? '✓' : 3}
+          </div>
+          <span>HOD Approval</span>
         </div>
       </div>
-    </div>
-  );
-};
-
-const RequestCard = ({ request }: { request: Request }) => {
-  const generatePDF = () => {
-    const doc = new jsPDF();
-    
-    // Add content to PDF
-    doc.setFontSize(16);
-    doc.text('Permission Request', 20, 20);
-    
-    doc.setFontSize(12);
-    doc.text(`Title: ${request.title}`, 20, 40);
-    doc.text(`Date: ${format(new Date(request.createdAt), 'MMM d, yyyy')}`, 20, 50);
-    
-    const contentLines = doc.splitTextToSize(request.content, 170);
-    doc.text(contentLines, 20, 70);
-    
-    // Add approval details
-    let y = 120;
-    if (request.professorApproval) {
-      doc.text('Professor Approval:', 20, y);
-      doc.text(`Status: ${request.professorApproval.status}`, 30, y + 10);
-      if (request.professorApproval.remarks) {
-        doc.text(`Remarks: ${request.professorApproval.remarks}`, 30, y + 20);
-      }
-      y += 40;
-    }
-    
-    if (request.hodApproval) {
-      doc.text('HOD Approval:', 20, y);
-      doc.text(`Status: ${request.hodApproval.status}`, 30, y + 10);
-      if (request.hodApproval.remarks) {
-        doc.text(`Remarks: ${request.hodApproval.remarks}`, 30, y + 20);
-      }
-    }
-    
-    doc.save(`permission-request-${request.id}.pdf`);
-  };
-
-  return (
-    <div className="bg-white rounded-lg shadow p-6 mb-4">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold">{request.title}</h3>
-          <p className="text-sm text-gray-500">
-            Submitted on {format(new Date(request.createdAt), 'MMM d, yyyy')}
-          </p>
-        </div>
-        {request.hodApproval?.status === 'approved' && (
-          <Button onClick={generatePDF} variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF
-          </Button>
-        )}
-      </div>
-
-      <div className="prose max-w-none mb-6">
-        <pre className="whitespace-pre-wrap font-sans text-sm">
-          {request.content}
-        </pre>
-      </div>
-
-      <RequestStages request={request} />
     </div>
   );
 };
@@ -156,8 +65,12 @@ const RequestCard = ({ request }: { request: Request }) => {
 export const RequestStatus = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const requests = useRequestStore((state) => state.requests);
+  const { requests, fetchRequests } = useRequestStore();
   const [filter, setFilter] = useState<Request['status'] | 'all'>('all');
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
   const userRequests = requests
     .filter((request) => request.studentId === user?.id)
@@ -195,10 +108,40 @@ export const RequestStatus = () => {
           </div>
         ) : (
           userRequests.map((request) => (
-            <RequestCard key={request.id} request={request} />
+            <div key={request.id} className="bg-white p-6 rounded-lg shadow">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold">{request.title}</h3>
+                  <p className="text-sm text-gray-500">
+                    Submitted on {format(new Date(request.createdAt), 'MMM d, yyyy')}
+                  </p>
+                </div>
+                {request.hodApproval?.status === 'approved' && (
+                  <Button onClick={() => generatePDF(request)} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </Button>
+                )}
+              </div>
+
+              <div className="prose max-w-none mb-6">
+                <pre className="whitespace-pre-wrap font-sans text-sm">
+                  {request.content}
+                </pre>
+              </div>
+
+              <RequestStages request={request} />
+            </div>
           ))
         )}
       </div>
     </div>
   );
+};
+
+const generatePDF = (request: Request) => {
+  const doc = new jsPDF();
+  doc.text(request.title, 10, 10);
+  doc.text(request.content, 10, 20);
+  doc.save(`${request.title}.pdf`);
 };

@@ -22,10 +22,7 @@ I am writing to request leave from [date] to [date] due to [reason].
 
 I will ensure to complete any missed assignments and catch up with the coursework.
 
-Thank you for your consideration.
-
-Yours sincerely,
-[Your Name]`,
+Thank you for your consideration.`,
   'deadline-extension': `Dear Sir/Madam,
 
 I am writing to request an extension for the [assignment/project name] deadline.
@@ -35,20 +32,14 @@ Due to [reason], I require additional time to complete the work properly.
 Current deadline: [date]
 Requested extension: [date]
 
-Thank you for your understanding.
-
-Yours sincerely,
-[Your Name]`,
+Thank you for your understanding.`,
   special: `Dear Sir/Madam,
 
 I am writing to request special permission regarding [matter].
 
 [Explain your situation and requirements]
 
-Thank you for your consideration.
-
-Yours sincerely,
-[Your Name]`,
+Thank you for your consideration.`,
   custom: '',
 };
 
@@ -68,7 +59,7 @@ export const NewRequest = () => {
     { id: 'prof2', name: 'Prof. Jane Smith' },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const request: Request = {
@@ -82,8 +73,12 @@ export const NewRequest = () => {
       createdAt: new Date(),
     };
 
-    addRequest(request);
-    navigate('/student/request-status');
+    try {
+      await addRequest(request);
+      navigate('/student/request-status');
+    } catch (error) {
+      alert('Failed to create request');
+    }
   };
 
   return (
@@ -142,6 +137,8 @@ export const NewRequest = () => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="w-full h-64 rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              title="Application Content"
+              placeholder="Write your application content here"
             />
           </div>
 
@@ -163,15 +160,8 @@ export const NewRequest = () => {
             </Select>
           </div>
 
-          <div className="flex justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/student')}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">Submit Request</Button>
+          <div>
+            <Button type="submit" className="w-full">Submit Request</Button>
           </div>
         </form>
       </div>

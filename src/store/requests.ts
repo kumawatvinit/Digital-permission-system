@@ -1,105 +1,45 @@
 import create from 'zustand';
 import { requests } from '../api';
-import { Request, RequestFilters, PaginatedResponse } from '../types';
+import { Request } from '../types';
 
 interface RequestState {
   requests: Request[];
-  loading: boolean;
-  error: string | null;
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-  };
-  filters: RequestFilters;
-  
-  setFilters: (filters: Partial<RequestFilters>) => void;
-  fetchRequests: (page?: number) => Promise<void>;
-  addRequest: (request: Omit<Request, 'id' | 'status' | 'createdAt'>) => Promise<void>;
+  fetchRequests: () => Promise<void>;
+  addRequest: (request: Request) => Promise<void>;
   updateRequest: (id: string, updates: Partial<Request>) => Promise<void>;
-  clearError: () => void;
 }
 
-export const useRequestStore = create<RequestState>((set, get) => ({
+export const useRequestStore = create<RequestState>((set) => ({
   requests: [],
-  loading: false,
-  error: null,
-  pagination: {
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0
-  },
-  filters: {
-    status: 'all',
-    type: undefined,
-    search: ''
-  },
-
-  setFilters: (newFilters) => {
-    set((state) => ({
-      filters: { ...state.filters, ...newFilters }
-    }));
-    get().fetchRequests(1); // Reset to first page with new filters
-  },
-
-  fetchRequests: async (page = 1) => {
-    set({ loading: true, error: null });
+  
+  fetchRequests: async () => {
     try {
-      const { filters } = get();
-      const response = await requests.getStudentRequests({
-        page,
-        ...filters
-      });
-      const { requests: data, pagination } = response.data as PaginatedResponse<Request>;
-      
-      set({
-        requests: data,
-        pagination,
-        loading: false
-      });
+      const response = await requests.getStudentRequests();
+      set({ requests: response.data });
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to fetch requests',
-        loading: false
-      });
+      console.error('Failed to fetch requests', error);
     }
   },
 
   addRequest: async (request) => {
-    set({ loading: true, error: null });
     try {
       const response = await requests.create(request);
-      set((state) => ({
-        requests: [response.data, ...state.requests],
-        loading: false
-      }));
+      set((state) => ({ requests: [...state.requests, response.data] }));
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to create request',
-        loading: false
-      });
-      throw error; // Re-throw for component handling
+      console.error('Failed to add request', error);
     }
   },
 
   updateRequest: async (id, updates) => {
-    set({ loading: true, error: null });
     try {
       const response = await requests.update(id, updates);
       set((state) => ({
-        requests: state.requests.map((req) =>
-          req.id === id ? { ...req, ...response.data } : req
+        requests: state.requests.map((request) =>
+          request.id === id ? { ...request, ...response.data } : request
         ),
-        loading: false
       }));
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to update request',
-        loading: false
-      });
-      throw error;
+      console.error('Failed to update request', error);
     }
   },
-
-  clearError: () => set({ error: null })
 }));
