@@ -72,12 +72,10 @@ export const RequestStatus = () => {
     fetchRequests();
   }, [fetchRequests]);
 
-  const userRequests = requests
-    ? requests
-        .filter((request) => request.studentId === user?._id)
-        .filter((request) => filter === 'all' || request.status === filter)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    : [];
+  const userRequests = (requests || [])
+    .filter((request) => request.studentId._id === user?._id)
+    .filter((request) => filter === 'all' || request.status === filter)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="space-y-6">
@@ -110,7 +108,7 @@ export const RequestStatus = () => {
           </div>
         ) : (
           userRequests.map((request) => (
-            <div key={request.id} className="bg-white p-6 rounded-lg shadow">
+            <div key={request._id} className="bg-white p-6 rounded-lg shadow">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-semibold">{request.title}</h3>

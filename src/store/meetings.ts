@@ -33,7 +33,7 @@ export const useMeetingStore = create<MeetingState>((set) => ({
       const response = await api.put(`/meetings/${id}`, updates);
       set((state) => ({
         meetings: state.meetings.map((meeting) =>
-          meeting.id === id ? response.data : meeting
+          meeting._id === id ? response.data : meeting
         ),
       }));
     } catch (error) {
@@ -44,7 +44,7 @@ export const useMeetingStore = create<MeetingState>((set) => ({
     try {
       await api.delete(`/meetings/${id}`);
       set((state) => ({
-        meetings: state.meetings.filter((meeting) => meeting.id !== id),
+        meetings: state.meetings.filter((meeting) => meeting._id !== id),
       }));
     } catch (error) {
       console.error('Failed to delete meeting', error);

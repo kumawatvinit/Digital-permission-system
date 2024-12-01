@@ -30,7 +30,7 @@ const MeetingForm = ({
     e.preventDefault();
     
     const meeting = {
-      id: initialData?.id || Date.now().toString(),
+      _id: initialData?._id || Date.now().toString(),
       ...formData,
       date: parseISO(formData.date),
       professorId: user._id,
@@ -38,7 +38,7 @@ const MeetingForm = ({
 
     try {
       if (initialData) {
-        await updateMeeting(initialData.id, meeting);
+        await updateMeeting(initialData._id, meeting);
       } else {
         await addMeeting(meeting);
       }
@@ -178,7 +178,7 @@ const MeetingCard = ({ meeting }: { meeting: Meeting }) => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => deleteMeeting(meeting.id)}
+              onClick={() => deleteMeeting(meeting._id)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -269,7 +269,7 @@ export const MeetingManagement = () => {
           </div>
         ) : (
           filteredMeetings.map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} />
+            <MeetingCard key={meeting._id} meeting={meeting} />
           ))
         )}
       </div>

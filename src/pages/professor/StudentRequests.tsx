@@ -14,7 +14,7 @@ const RequestCard = ({ request }: { request: Request }) => {
   const [isForwarded, setIsForwarded] = useState(false);
 
   const handleAction = (status: 'approved' | 'rejected') => {
-    updateRequest(request.id, {
+    updateRequest(request._id, {
       status,
       professorApproval: {
         status,
@@ -29,7 +29,7 @@ const RequestCard = ({ request }: { request: Request }) => {
       return;
     }
     
-    updateRequest(request.id, {
+    updateRequest(request._id, {
       status: 'forwarded',
     });
     setIsForwarded(true);
@@ -148,7 +148,7 @@ export const StudentRequests = () => {
           </div>
         ) : (
           filteredRequests.map((request) => (
-            <RequestCard key={request.id} request={request} />
+            <RequestCard key={request._id} request={request} />
           ))
         )}
       </div>

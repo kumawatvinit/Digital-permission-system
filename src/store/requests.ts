@@ -35,7 +35,7 @@ export const useRequestStore = create<RequestState>((set) => ({
       const response = await requests.update(id, updates);
       set((state) => ({
         requests: state.requests.map((request) =>
-          request.id === id ? { ...request, ...response.data } : request
+          request._id === id ? { ...request, ...response.data } : request
         ),
       }));
     } catch (error) {

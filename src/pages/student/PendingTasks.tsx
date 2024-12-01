@@ -9,7 +9,7 @@ import { Attendance } from '../../types';
 // Mock data - In a real app, this would come from an API
 const mockAttendance: Attendance[] = [
   {
-    id: '1',
+    _id: '1',
     batch: 'TYECO',
     course: 'Digital Electronics',
     professorId: 'prof1',
@@ -122,7 +122,7 @@ export const PendingTasks = () => {
           </div>
         ) : (
           pendingAttendance.map((attendance) => (
-            <AttendanceCard key={attendance.id} attendance={attendance} />
+            <AttendanceCard key={attendance._id} attendance={attendance} />
           ))
         )}
       </div>

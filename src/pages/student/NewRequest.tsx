@@ -72,7 +72,7 @@ export const NewRequest = () => {
     }
 
     const request: Request = {
-      id: Date.now().toString(),
+      _id: Date.now().toString(),
       title,
       content,
       studentId: user!._id,

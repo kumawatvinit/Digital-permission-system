@@ -18,7 +18,7 @@ export interface Professor extends User {
 }
 
 export interface Request {
-  id: string;
+  _id: string;
   title: string;
   content: string;
   studentId: string;
@@ -40,7 +40,7 @@ export interface Request {
 }
 
 export interface Attendance {
-  id: string;
+  _id: string;
   batch: BatchType;
   course: string;
   professorId: string;
@@ -55,7 +55,7 @@ export interface Attendance {
 }
 
 export interface Meeting {
-  id: string;
+  _id: string;
   title: string;
   batches: BatchType[];
   professorId: string;
