@@ -19,6 +19,7 @@ export const auth = {
   login: (data: any) => api.post('/users/login', data),
   register: (data: any) => api.post('/users/register', data),
   update: (data: any) => api.put('/users/update', data),
+  getProfessors: () => api.get('/users/professors'),
 };
 
 export const requests = {
@@ -33,6 +34,13 @@ export const attendance = {
   getProfessorRecords: () => api.get('/attendance/professor'),
   getStudentRecords: (batch: string) => api.get(`/attendance/student/${batch}`),
   submit: (id: string, data: any) => api.post(`/attendance/${id}/submit`, data),
+};
+
+export const meetings = {
+  create: (data: any) => api.post('/meetings', data),
+  getProfessorMeetings: () => api.get('/meetings/professor'),
+  update: (id: string, data: any) => api.put(`/meetings/${id}`, data),
+  delete: (id: string) => api.delete(`/meetings/${id}`),
 };
 
 export default api;

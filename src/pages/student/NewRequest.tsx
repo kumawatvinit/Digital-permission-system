@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -6,7 +6,8 @@ import { Select } from '../../components/ui/Select';
 import { Input } from '../../components/ui/Input';
 import { useRequestStore } from '../../store/requests';
 import { useAuthStore } from '../../store/auth';
-import { Request } from '../../types';
+import { Request, Professor } from '../../types';
+import api from '../../api';
 
 const REQUEST_TYPES = [
   { id: 'leave', label: 'Apply for Leave' },
@@ -25,19 +26,14 @@ I will ensure to complete any missed assignments and catch up with the coursewor
 Thank you for your consideration.`,
   'deadline-extension': `Dear Sir/Madam,
 
-I am writing to request an extension for the [assignment/project name] deadline.
+I am writing to request an extension for the deadline of [assignment/project] due to [reason].
 
-Due to [reason], I require additional time to complete the work properly.
-
-Current deadline: [date]
-Requested extension: [date]
+I will ensure to complete it by the extended deadline.
 
 Thank you for your understanding.`,
   special: `Dear Sir/Madam,
 
-I am writing to request special permission regarding [matter].
-
-[Explain your situation and requirements]
+I am writing to request special permission for [reason].
 
 Thank you for your consideration.`,
   custom: '',
@@ -45,19 +41,26 @@ Thank you for your consideration.`,
 
 export const NewRequest = () => {
   const navigate = useNavigate();
-  const user = useAuthStore((state) => state.user);
   const addRequest = useRequestStore((state) => state.addRequest);
-  
-  const [type, setType] = useState<keyof typeof TEMPLATES>('leave');
+  const user = useAuthStore((state) => state.user);
+  const [type, setType] = useState<typeof REQUEST_TYPES[number]['id']>('leave');
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState(TEMPLATES.leave);
+  const [content, setContent] = useState(TEMPLATES[type]);
   const [selectedProfessor, setSelectedProfessor] = useState('');
+  const [professors, setProfessors] = useState<Professor[]>([]);
 
-  // In a real app, this would come from an API
-  const professors = [
-    { id: 'prof1', name: 'Prof. John Doe' },
-    { id: 'prof2', name: 'Prof. Jane Smith' },
-  ];
+  useEffect(() => {
+    const fetchProfessors = async () => {
+      try {
+        const response = await api.get('/users/professors');
+        setProfessors(response.data);
+      } catch (error) {
+        console.error('Failed to fetch professors', error);
+      }
+    };
+
+    fetchProfessors();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus, Edit2, Trash2, Calendar } from 'lucide-react';
 import { format, isFuture, parseISO } from 'date-fns';
@@ -26,7 +26,7 @@ const MeetingForm = ({
     batches: initialData?.batches || [] as BatchType[],
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const meeting = {
@@ -36,12 +36,16 @@ const MeetingForm = ({
       professorId: user.id,
     };
 
-    if (initialData) {
-      updateMeeting(initialData.id, meeting);
-    } else {
-      addMeeting(meeting);
+    try {
+      if (initialData) {
+        await updateMeeting(initialData.id, meeting);
+      } else {
+        await addMeeting(meeting);
+      }
+      onClose();
+    } catch (error) {
+      alert('Failed to save meeting');
     }
-    onClose();
   };
 
   const handleBatchToggle = (batch: BatchType) => {
@@ -203,9 +207,13 @@ const MeetingCard = ({ meeting }: { meeting: Meeting }) => {
 export const MeetingManagement = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user) as Professor;
-  const meetings = useMeetingStore((state) => state.meetings);
+  const { meetings, fetchMeetings } = useMeetingStore();
   const [showNewForm, setShowNewForm] = useState(false);
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+
+  useEffect(() => {
+    fetchMeetings();
+  }, [fetchMeetings]);
 
   const filteredMeetings = meetings
     .filter((meeting) => meeting.professorId === user.id)

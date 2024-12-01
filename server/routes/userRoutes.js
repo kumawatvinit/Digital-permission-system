@@ -55,6 +55,16 @@ router.post('/login', validate(userValidationRules.login), async (req, res) => {
   }
 });
 
+// Get all professors
+router.get('/professors', auth, async (req, res) => {
+  try {
+    const professors = await User.find({ role: 'professor' }).select('id name');
+    res.json(professors);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update User
 router.put('/update', auth, async (req, res) => {
   try {
