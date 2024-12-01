@@ -73,9 +73,11 @@ export const RequestStatus = () => {
   }, [fetchRequests]);
 
   const userRequests = requests
-    .filter((request) => request.studentId === user?._id)
-    .filter((request) => filter === 'all' || request.status === filter)
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    ? requests
+        .filter((request) => request.studentId === user?._id)
+        .filter((request) => filter === 'all' || request.status === filter)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    : [];
 
   return (
     <div className="space-y-6">
