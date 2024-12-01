@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { User, Student, Professor } from '../types';
 
 export const ProfilePage = () => {
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user) as User;
   const updateUser = useAuthStore((state) => state.updateUser);
   const [email, setEmail] = useState(user.email);
@@ -19,8 +21,23 @@ export const ProfilePage = () => {
     }
   };
 
+  const handleBackToDashboard = () => {
+    if (user.role === 'student') {
+      navigate('/student');
+    } else if (user.role === 'professor') {
+      navigate('/professor');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <Button
+        variant="ghost"
+        className="mb-4"
+        onClick={handleBackToDashboard}
+      >
+        Back to Dashboard
+      </Button>
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
       <div className="space-y-4">
         <div>

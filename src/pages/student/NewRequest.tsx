@@ -71,8 +71,7 @@ export const NewRequest = () => {
       return;
     }
 
-    const request: Request = {
-      _id: Date.now().toString(),
+    const request: Omit<Request, '_id'> = {
       title,
       content,
       studentId: user!._id,
