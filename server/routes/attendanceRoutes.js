@@ -1,7 +1,8 @@
 const express = require('express');
 const Attendance = require('../models/Attendance');
 const { auth, roleAuth } = require('../middleware/auth');
-const { validate, attendanceValidationRules } = require('../validations/attendanceRules');
+const validate = require('../validations/validate');
+const attendanceValidationRules = require('../validations/attendanceRules');
 
 const router = express.Router();
 
