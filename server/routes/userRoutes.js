@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const validate = require('../validations/validate');
 const userValidationRules = require('../validations/userRules');
+const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -49,6 +50,29 @@ router.post('/login', validate(userValidationRules.login), async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
     res.json({ token, user: { id: user._id, name: user.name, email, role: user.role } });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update User
+router.put('/update', auth, async (req, res) => {
+  try {
+    const { name, email, role, batch, batches } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.role = role || user.role;
+    user.batch = batch || user.batch;
+    user.batches = batches || user.batches;
+
+    await user.save();
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

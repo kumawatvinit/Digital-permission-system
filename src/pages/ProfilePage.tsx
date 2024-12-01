@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/auth';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { User, Student, Professor, BatchType } from '../types';
+import { User, Student, Professor } from '../types';
 
 export const ProfilePage = () => {
   const user = useAuthStore((state) => state.user) as User;
@@ -11,9 +10,13 @@ export const ProfilePage = () => {
   const [email, setEmail] = useState(user.email);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
 
-  const handleEmailUpdate = () => {
-    updateUser({ ...user, email });
-    setIsEditingEmail(false);
+  const handleEmailUpdate = async () => {
+    try {
+      await updateUser({ ...user, email });
+      setIsEditingEmail(false);
+    } catch (error) {
+      alert('Failed to update email');
+    }
   };
 
   return (
@@ -50,58 +53,16 @@ export const ProfilePage = () => {
   );
 };
 
-const StudentProfile = ({ user }: { user: Student }) => {
-  return (
-    <div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Batch</label>
-        <p>{user.batch}</p>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Students in Batch</label>
-        <ul>
-          {/* Assuming we have a way to fetch students in the same batch */}
-          {/* Replace with actual data fetching logic */}
-          {['Student 1', 'Student 2', 'Student 3'].map((student) => (
-            <li key={student}>{student}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
+const StudentProfile = ({ user }: { user: Student }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Batch</label>
+    <p>{user.batch}</p>
+  </div>
+);
 
-const ProfessorProfile = ({ user }: { user: Professor }) => {
-  const [selectedBatch, setSelectedBatch] = useState(user.batches[0]);
-
-  return (
-    <div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Batches</label>
-        <ul>
-          {user.batches.map((batch) => (
-            <li key={batch}>{batch}</li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Select Batch</label>
-        <Select value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value as BatchType)}>
-          {user.batches.map((batch) => (
-            <option key={batch} value={batch}>{batch}</option>
-          ))}
-        </Select>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Students in Batch</label>
-        <ul>
-          {/* Assuming we have a way to fetch students in the selected batch */}
-          {/* Replace with actual data fetching logic */}
-          {['Student 1', 'Student 2', 'Student 3'].map((student) => (
-            <li key={student}>{student}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
+const ProfessorProfile = ({ user }: { user: Professor }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Batches</label>
+    <p>{user.batches.join(', ')}</p>
+  </div>
+);

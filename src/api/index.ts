@@ -18,6 +18,7 @@ api.interceptors.request.use((config) => {
 export const auth = {
   login: (data: any) => api.post('/users/login', data),
   register: (data: any) => api.post('/users/register', data),
+  update: (data: any) => api.put('/users/update', data), // Add update user API call
 };
 
 export const requests = {
