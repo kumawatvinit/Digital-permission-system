@@ -1,6 +1,5 @@
 import create from 'zustand';
 import { auth } from '../api';
-import { User } from '../types';
 
 interface AuthState {
   user: User | null;
@@ -13,41 +12,25 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: localStorage.getItem('token'),
-  
-  login: async (email: string, password: string) => {
-    try {
-      const response = await auth.login({ email, password });
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      set({ user, token });
-    } catch (error) {
-      throw error;
-    }
+  token: null,
+  login: async (email, password) => {
+    const response = await auth.login({ email, password });
+    const { token, user } = response.data;
+    localStorage.setItem('token', token);
+    set({ user, token });
   },
-
   register: async (userData) => {
-    try {
-      const response = await auth.register(userData);
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      set({ user, token });
-    } catch (error) {
-      throw error;
-    }
+    const response = await auth.register(userData);
+    const { token, user } = response.data;
+    localStorage.setItem('token', token);
+    set({ user, token });
   },
-
   logout: () => {
     localStorage.removeItem('token');
     set({ user: null, token: null });
   },
-
   updateUser: async (user) => {
-    try {
-      const response = await auth.update(user);
-      set({ user: response.data });
-    } catch (error) {
-      throw error;
-    }
+    const response = await auth.update(user);
+    set({ user: response.data });
   },
 }));
