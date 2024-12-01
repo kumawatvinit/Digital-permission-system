@@ -11,27 +11,45 @@ interface AuthState {
   updateUser: (user: User) => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token: null,
-  login: async (email, password) => {
-    const response = await auth.login({ email, password });
-    const { token, user } = response.data;
-    localStorage.setItem('token', token);
-    set({ user, token });
-  },
-  register: async (userData) => {
-    const response = await auth.register(userData);
-    const { token, user } = response.data;
-    localStorage.setItem('token', token);
-    set({ user, token });
-  },
-  logout: () => {
-    localStorage.removeItem('token');
-    set({ user: null, token: null });
-  },
-  updateUser: async (user) => {
-    const response = await auth.update(user);
-    set({ user: response.data });
-  },
-}));
+export const useAuthStore = create<AuthState>((set) => {
+  const token = localStorage.getItem('token');
+  let user: User | null = null;
+
+  if (token) {
+    // Optionally, you can make an API call to fetch the user details using the token
+    // For simplicity, we'll assume the user details are stored in localStorage as well
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      user = JSON.parse(storedUser);
+    }
+  }
+
+  return {
+    user,
+    token,
+    login: async (email, password) => {
+      const response = await auth.login({ email, password });
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user, token });
+    },
+    register: async (userData) => {
+      const response = await auth.register(userData);
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user, token });
+    },
+    logout: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      set({ user: null, token: null });
+    },
+    updateUser: async (user) => {
+      const response = await auth.update(user);
+      localStorage.setItem('user', JSON.stringify(response.data));
+      set({ user: response.data });
+    },
+  };
+});
