@@ -64,7 +64,13 @@ export const NewRequest = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Validate professorId
+    if (!selectedProfessor.match(/^[0-9a-fA-F]{24}$/)) {
+      alert('Invalid professor ID');
+      return;
+    }
+
     const request: Request = {
       id: Date.now().toString(),
       title,
@@ -95,79 +101,75 @@ export const NewRequest = () => {
         Back to Dashboard
       </Button>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-6">New Permission Request</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Request Type
+          </label>
+          <Select
+            required
+            value={type}
+            onChange={(e) => {
+              setType(e.target.value as typeof REQUEST_TYPES[number]['id']);
+              setContent(TEMPLATES[e.target.value as typeof REQUEST_TYPES[number]['id']]);
+            }}
+          >
+            {REQUEST_TYPES.map((requestType) => (
+              <option key={requestType.id} value={requestType.id}>
+                {requestType.label}
+              </option>
+            ))}
+          </Select>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Request Type
-            </label>
-            <Select
-              value={type}
-              onChange={(e) => {
-                const newType = e.target.value as keyof typeof TEMPLATES;
-                setType(newType);
-                setContent(TEMPLATES[newType]);
-              }}
-            >
-              {REQUEST_TYPES.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Title
+          </label>
+          <Input
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter the title of your request"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title
-            </label>
-            <Input
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Brief description of your request"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Application Content
+          </label>
+          <textarea
+            required
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="w-full h-64 rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            title="Application Content"
+            placeholder="Write your application content here"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Application Content
-            </label>
-            <textarea
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full h-64 rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
-              title="Application Content"
-              placeholder="Write your application content here"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Select Professor
+          </label>
+          <Select
+            required
+            value={selectedProfessor}
+            onChange={(e) => setSelectedProfessor(e.target.value)}
+          >
+            <option value="">Select a professor</option>
+            {professors.map((prof) => (
+              <option key={prof.id} value={prof.id}>
+                {prof.name}
+              </option>
+            ))}
+          </Select>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Professor
-            </label>
-            <Select
-              required
-              value={selectedProfessor}
-              onChange={(e) => setSelectedProfessor(e.target.value)}
-            >
-              <option value="">Select a professor</option>
-              {professors.map((prof) => (
-                <option key={prof.id} value={prof.id}>
-                  {prof.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-
-          <div>
-            <Button type="submit" className="w-full">Submit Request</Button>
-          </div>
-        </form>
-      </div>
+        <Button type="submit" className="w-full">
+          Submit Request
+        </Button>
+      </form>
     </div>
   );
 };

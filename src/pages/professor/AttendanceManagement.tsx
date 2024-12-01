@@ -24,7 +24,8 @@ const NewAttendanceForm = ({
     e.preventDefault();
     
     const now = new Date();
-    const attendance = {
+    const attendance: Attendance = {
+      id: '', // Generate or assign a unique ID here
       batch,
       course,
       professorId: user.id,
@@ -193,7 +194,7 @@ export const AttendanceManagement = () => {
           </div>
         ) : (
           userAttendance.map((attendance) => (
-            <AttendanceCard key={attendance._id} attendance={attendance} />
+            <AttendanceCard key={attendance.id} attendance={attendance} />
           ))
         )}
       </div>
