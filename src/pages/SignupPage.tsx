@@ -44,11 +44,13 @@ export const SignupPage = () => {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center py-12">
+    <div className="flex min-h-[80vh] items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <GraduationCap className="mx-auto h-12 w-12 text-blue-600" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign up</h2>
+          <h2 className="mt-6 text-3xl font-bold tracking-tight">
+            Sign up for an account
+          </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -89,10 +91,10 @@ export const SignupPage = () => {
               />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="sr-only">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
               <Input
-                id="confirm-password"
-                name="confirm-password"
+                id="confirmPassword"
+                name="confirmPassword"
                 type="password"
                 required
                 placeholder="Confirm Password"
@@ -100,43 +102,49 @@ export const SignupPage = () => {
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               />
             </div>
-            {role === 'student' ? (
-              <div>
-                <label htmlFor="batch" className="sr-only">Batch</label>
-                <Select
-                  id="batch"
-                  name="batch"
-                  value={formData.batch}
-                  onChange={(e) => setFormData({ ...formData, batch: e.target.value as BatchType })}
-                >
-                  {BATCH_OPTIONS.map((batch) => (
-                    <option key={batch} value={batch}>{batch}</option>
-                  ))}
-                </Select>
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Batches</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {BATCH_OPTIONS.map((batch) => (
-                    <Button
-                      key={batch}
-                      type="button"
-                      variant={formData.batches.includes(batch) ? 'default' : 'outline'}
-                      onClick={() => setFormData((prev) => ({
-                        ...prev,
-                        batches: prev.batches.includes(batch)
-                          ? prev.batches.filter((b) => b !== batch)
-                          : [...prev.batches, batch],
-                      }))}
-                    >
-                      {batch}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+
+          {role === 'student' && (
+            <div>
+              <label htmlFor="batch" className="block text-sm font-medium text-gray-700">Batch</label>
+              <Select
+                id="batch"
+                name="batch"
+                value={formData.batch}
+                onChange={(e) => setFormData({ ...formData, batch: e.target.value as BatchType })}
+              >
+                {BATCH_OPTIONS.map((batch) => (
+                  <option key={batch} value={batch}>
+                    {batch}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
+
+          {role === 'professor' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Batches</label>
+              <div className="flex flex-wrap gap-2">
+                {BATCH_OPTIONS.map((batch) => (
+                  <Button
+                    key={batch}
+                    type="button"
+                    variant={formData.batches.includes(batch) ? 'default' : 'outline'}
+                    onClick={() => setFormData((prev) => ({
+                      ...prev,
+                      batches: prev.batches.includes(batch)
+                        ? prev.batches.filter((b) => b !== batch)
+                        : [...prev.batches, batch],
+                    }))}
+                  >
+                    {batch}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-4">
             <Button
               type="button"

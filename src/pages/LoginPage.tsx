@@ -23,7 +23,7 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center">
+    <div className="flex min-h-[80vh] items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <GraduationCap className="mx-auto h-12 w-12 text-blue-600" />
