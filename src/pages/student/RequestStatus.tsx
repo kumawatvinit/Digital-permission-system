@@ -65,14 +65,14 @@ const RequestStages = ({ request }: { request: Request }) => {
 export const RequestStatus = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const { requests, fetchRequests } = useRequestStore();
+  const { requests = [], fetchRequests } = useRequestStore();
   const [filter, setFilter] = useState<Request['status'] | 'all'>('all');
 
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
 
-  const userRequests = (requests || [])
+  const userRequests = requests
     .filter((request) => request.studentId._id === user?._id)
     .filter((request) => filter === 'all' || request.status === filter)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
