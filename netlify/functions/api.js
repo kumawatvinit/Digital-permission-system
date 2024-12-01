@@ -1,8 +1,7 @@
-const express = require('express');
+const awsServerlessExpress = require('aws-serverless-express');
 const app = require('../../server');
+const server = awsServerlessExpress.createServer(app);
 
-module.exports.handler = async (event, context) => {
-  const server = express();
-  server.use('/.netlify/functions/api', app);
-  return server(event, context);
+exports.handler = (event, context) => {
+  return awsServerlessExpress.proxy(server, event, context);
 };
