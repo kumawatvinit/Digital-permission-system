@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Download, Plus } from 'lucide-react';
 import { format, addHours } from 'date-fns';
@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { useAuthStore } from '../../store/auth';
 import { useAttendanceStore } from '../../store/attendance';
-import { BatchType, Professor } from '../../types';
+import { BatchType, Professor, Attendance } from '../../types';
 
 const NewAttendanceForm = ({
   onClose,
@@ -20,12 +20,11 @@ const NewAttendanceForm = ({
   const [course, setCourse] = useState('');
   const [duration, setDuration] = useState('60');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const now = new Date();
     const attendance = {
-      id: Date.now().toString(),
       batch,
       course,
       professorId: user.id,
@@ -35,8 +34,12 @@ const NewAttendanceForm = ({
       students: [],
     };
 
-    addAttendance(attendance);
-    onClose();
+    try {
+      await addAttendance(attendance);
+      onClose();
+    } catch (error) {
+      alert('Failed to create attendance record');
+    }
   };
 
   return (
@@ -117,40 +120,29 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
   };
 
-  const now = new Date();
-  const isActive = now < attendance.expiresAt;
-
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white p-6 rounded-lg shadow">
+      <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold">{attendance.course}</h3>
           <p className="text-sm text-gray-500">
-            {attendance.batch} • {format(attendance.date, 'MMM d, yyyy h:mm a')}
+            {format(attendance.date, 'MMM d, yyyy h:mm a')}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          {isActive ? (
-            <span className="text-green-600 font-medium">Active</span>
-          ) : (
-            <span className="text-gray-500 font-medium">Closed</span>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={downloadReport}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Download Report
-          </Button>
-        </div>
+        <Button onClick={downloadReport} variant="outline" size="sm">
+          <Download className="h-4 w-4 mr-2" />
+          Download Report
+        </Button>
       </div>
 
       <div className="text-sm text-gray-600">
         {attendance.students.length} submissions
+      </div>
+
+      <div className="text-sm text-gray-600">
+        Status: {attendance.status === 'active' ? 'Active' : 'Not Active'}
       </div>
     </div>
   );
@@ -159,8 +151,12 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
 export const AttendanceManagement = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user) as Professor;
-  const attendanceRecords = useAttendanceStore((state) => state.attendanceRecords);
+  const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
   const [showNewForm, setShowNewForm] = useState(false);
+
+  useEffect(() => {
+    fetchAttendanceRecords();
+  }, [fetchAttendanceRecords]);
 
   const userAttendance = attendanceRecords
     .filter((record) => record.professorId === user.id)
@@ -197,7 +193,7 @@ export const AttendanceManagement = () => {
           </div>
         ) : (
           userAttendance.map((attendance) => (
-            <AttendanceCard key={attendance.id} attendance={attendance} />
+            <AttendanceCard key={attendance._id} attendance={attendance} />
           ))
         )}
       </div>

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cd server && npm install",
+    "build": "vite build && npm install --prefix server",
     "lint": "eslint .",
     "start": "node server/index.js",
     "preview": "vite preview"
@@ -25,6 +25,7 @@
     "jspdf": "^2.5.1",
     "lucide-react": "^0.344.0",
     "mongoose": "^8.8.3",
+    "netlify-lambda": "^2.0.16",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.3",

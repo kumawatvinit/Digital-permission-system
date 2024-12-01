@@ -6,8 +6,8 @@ interface AttendanceState {
   attendanceRecords: Attendance[];
   loading: boolean;
   error: string | null;
-  fetchAttendance: () => Promise<void>;
-  addAttendance: (attendance: Omit<Attendance, 'id'>) => Promise<void>;
+  fetchAttendanceRecords: () => Promise<void>;
+  addAttendance: (attendance: Attendance) => Promise<void>;
   updateAttendance: (id: string, updates: Partial<Attendance>) => Promise<void>;
   clearError: () => void;
 }
@@ -17,7 +17,7 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
   loading: false,
   error: null,
 
-  fetchAttendance: async () => {
+  fetchAttendanceRecords: async () => {
     set({ loading: true, error: null });
     try {
       const response = await attendance.getProfessorRecords();
@@ -35,7 +35,7 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
     try {
       const response = await attendance.create(attendanceData);
       set((state) => ({
-        attendanceRecords: [response.data, ...state.attendanceRecords],
+        attendanceRecords: [...state.attendanceRecords, response.data],
         loading: false
       }));
     } catch (error) {
@@ -53,7 +53,7 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
       const response = await attendance.update(id, updates);
       set((state) => ({
         attendanceRecords: state.attendanceRecords.map((record) =>
-          record.id === id ? { ...record, ...response.data } : record
+          record._id === id ? { ...record, ...response.data } : record
         ),
         loading: false
       }));
