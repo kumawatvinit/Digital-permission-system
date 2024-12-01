@@ -10,7 +10,7 @@ import { BatchType } from '../types';
 
 export const SignupPage = () => {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
+  const register = useAuthStore((state) => state.register);
   const [role, setRole] = useState<'student' | 'professor'>('student');
   const [formData, setFormData] = useState({
     name: '',
@@ -21,30 +21,26 @@ export const SignupPage = () => {
     batches: [] as BatchType[],
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
 
-    // In a real app, this would make an API call
-    setUser({
-      id: '1',
-      name: formData.name,
-      email: formData.email,
-      role,
-    });
-    navigate(role === 'student' ? '/student' : '/professor');
-  };
-
-  const handleBatchToggle = (batch: BatchType) => {
-    setFormData((prev) => ({
-      ...prev,
-      batches: prev.batches.includes(batch)
-        ? prev.batches.filter((b) => b !== batch)
-        : [...prev.batches, batch],
-    }));
+    try {
+      await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role,
+        batch: role === 'student' ? formData.batch : undefined,
+        batches: role === 'professor' ? formData.batches : undefined,
+      });
+      navigate(role === 'student' ? '/student' : '/professor');
+    } catch (error) {
+      alert('Registration failed');
+    }
   };
 
   return (
@@ -52,125 +48,87 @@ export const SignupPage = () => {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <GraduationCap className="mx-auto h-12 w-12 text-blue-600" />
-          <h2 className="mt-6 text-3xl font-bold tracking-tight">
-            Create your account
-          </h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign up</h2>
         </div>
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant={role === 'student' ? 'default' : 'outline'}
-                className="flex-1"
-                onClick={() => setRole('student')}
-              >
-                Student
-              </Button>
-              <Button
-                type="button"
-                variant={role === 'professor' ? 'default' : 'outline'}
-                className="flex-1"
-                onClick={() => setRole('professor')}
-              >
-                Professor
-              </Button>
-            </div>
-
+          <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
+              <label htmlFor="name" className="sr-only">Name</label>
               <Input
+                id="name"
+                name="name"
+                type="text"
                 required
+                placeholder="Name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+              <label htmlFor="email" className="sr-only">Email address</label>
               <Input
+                id="email"
+                name="email"
                 type="email"
                 required
+                placeholder="Email address"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, email: e.target.value }))
-                }
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <Input
+                id="password"
+                name="password"
                 type="password"
                 required
+                placeholder="Password"
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, password: e.target.value }))
-                }
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
+              <label htmlFor="confirm-password" className="sr-only">Confirm Password</label>
               <Input
+                id="confirm-password"
+                name="confirm-password"
                 type="password"
                 required
+                placeholder="Confirm Password"
                 value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    confirmPassword: e.target.value,
-                  }))
-                }
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               />
             </div>
-
             {role === 'student' ? (
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Batch
-                </label>
+                <label htmlFor="batch" className="sr-only">Batch</label>
                 <Select
+                  id="batch"
+                  name="batch"
                   value={formData.batch}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      batch: e.target.value as BatchType,
-                    }))
-                  }
+                  onChange={(e) => setFormData({ ...formData, batch: e.target.value as BatchType })}
                 >
                   {BATCH_OPTIONS.map((batch) => (
-                    <option key={batch} value={batch}>
-                      {batch}
-                    </option>
+                    <option key={batch} value={batch}>{batch}</option>
                   ))}
                 </Select>
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Batches
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Batches</label>
                 <div className="grid grid-cols-2 gap-2">
                   {BATCH_OPTIONS.map((batch) => (
                     <Button
                       key={batch}
                       type="button"
-                      variant={
-                        formData.batches.includes(batch) ? 'default' : 'outline'
-                      }
-                      onClick={() => handleBatchToggle(batch)}
+                      variant={formData.batches.includes(batch) ? 'default' : 'outline'}
+                      onClick={() => setFormData((prev) => ({
+                        ...prev,
+                        batches: prev.batches.includes(batch)
+                          ? prev.batches.filter((b) => b !== batch)
+                          : [...prev.batches, batch],
+                      }))}
                     >
                       {batch}
                     </Button>
@@ -179,17 +137,11 @@ export const SignupPage = () => {
               </div>
             )}
           </div>
-
           <div>
-            <Button type="submit" className="w-full">
-              Sign up
-            </Button>
+            <Button type="submit" className="w-full">Sign up</Button>
           </div>
-
-          <div className="text-center text-sm">
-            <Link to="/" className="text-blue-600 hover:underline">
-              Already have an account? Sign in
-            </Link>
+          <div className="text-sm text-center">
+            Already have an account? <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">Log in</Link>
           </div>
         </form>
       </div>

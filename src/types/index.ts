@@ -63,3 +63,24 @@ export interface Meeting {
   time: string;
   description?: string;
 }
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+  };
+}
+
+export interface RequestFilters {
+  status: 'all' | 'pending' | 'approved' | 'rejected' | 'forwarded';
+  type?: 'leave' | 'deadline-extension' | 'special' | 'custom';
+  search?: string;
+}
+
+export interface APIError {
+  error: string;
+  message?: string;
+  details?: string[];
+}
