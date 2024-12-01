@@ -28,7 +28,7 @@ const NewAttendanceForm = ({
       id: '', // Generate or assign a unique ID here
       batch,
       course,
-      professorId: user.id,
+      professorId: user._id,
       date: now,
       expiresAt: addHours(now, parseInt(duration) / 60),
       status: 'active',
@@ -160,7 +160,7 @@ export const AttendanceManagement = () => {
   }, [fetchAttendanceRecords]);
 
   const userAttendance = attendanceRecords
-    .filter((record) => record.professorId === user.id)
+    .filter((record) => record.professorId === user._id)
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return (

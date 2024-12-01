@@ -33,7 +33,7 @@ const MeetingForm = ({
       id: initialData?.id || Date.now().toString(),
       ...formData,
       date: parseISO(formData.date),
-      professorId: user.id,
+      professorId: user._id,
     };
 
     try {
@@ -216,7 +216,7 @@ export const MeetingManagement = () => {
   }, [fetchMeetings]);
 
   const filteredMeetings = meetings
-    .filter((meeting) => meeting.professorId === user.id)
+    .filter((meeting) => meeting.professorId === user._id)
     .filter((meeting) => {
       if (filter === 'upcoming') return isFuture(new Date(meeting.date));
       if (filter === 'past') return !isFuture(new Date(meeting.date));

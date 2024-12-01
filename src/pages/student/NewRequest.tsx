@@ -75,7 +75,7 @@ export const NewRequest = () => {
       id: Date.now().toString(),
       title,
       content,
-      studentId: user!.id,
+      studentId: user!._id,
       professorId: selectedProfessor,
       status: 'pending',
       type,
@@ -159,7 +159,7 @@ export const NewRequest = () => {
           >
             <option value="">Select a professor</option>
             {professors.map((prof) => (
-              <option key={prof.id} value={prof.id}>
+              <option key={prof._id} value={prof._id}>
                 {prof.name}
               </option>
             ))}

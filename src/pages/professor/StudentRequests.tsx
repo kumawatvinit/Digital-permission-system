@@ -25,7 +25,7 @@ const RequestCard = ({ request }: { request: Request }) => {
   };
 
   const handleForward = () => {
-    if (!request.professorApproval?.status === 'approved') {
+    if (request.professorApproval?.status !== 'approved') {
       return;
     }
     
@@ -112,7 +112,7 @@ export const StudentRequests = () => {
   const [filter, setFilter] = useState<Request['status'] | 'all'>('all');
 
   const filteredRequests = requests
-    .filter((request) => request.professorId === user?.id)
+    .filter((request) => request.professorId === user?._id)
     .filter((request) => filter === 'all' || request.status === filter)
     .filter((request) => request.status !== 'forwarded')
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());

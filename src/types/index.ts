@@ -1,7 +1,7 @@
 export type BatchType = 'TYECO' | 'TYCSO' | 'TYMEO' | 'TYEEO' | 'SYECO' | 'SYCSO' | 'SYMEO' | 'SYEEO' | 'FYECO' | 'FYCSO' | 'FYMEO' | 'FYEEO';
 
 export interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   role: 'student' | 'professor' | 'hod';

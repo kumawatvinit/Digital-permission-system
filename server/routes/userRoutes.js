@@ -28,7 +28,7 @@ router.post('/register', validate(userValidationRules.register), async (req, res
 
     await user.save();
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.status(201).json({ token, user: { id: user._id, name, email, role } });
+    res.status(201).json({ token, user: { _id: user._id, name, email, role } });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -49,7 +49,7 @@ router.post('/login', validate(userValidationRules.login), async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.json({ token, user: { id: user._id, name: user.name, email, role: user.role } });
+    res.json({ token, user: { _id: user._id, name: user.name, email, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -58,7 +58,7 @@ router.post('/login', validate(userValidationRules.login), async (req, res) => {
 // Get all professors
 router.get('/professors', auth, async (req, res) => {
   try {
-    const professors = await User.find({ role: 'professor' }).select('id name');
+    const professors = await User.find({ role: 'professor' }).select('_id name');
     res.json(professors);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

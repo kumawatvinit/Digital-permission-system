@@ -73,7 +73,7 @@ export const RequestStatus = () => {
   }, [fetchRequests]);
 
   const userRequests = requests
-    .filter((request) => request.studentId === user?.id)
+    .filter((request) => request.studentId === user?._id)
     .filter((request) => filter === 'all' || request.status === filter)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
