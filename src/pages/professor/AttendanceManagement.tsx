@@ -15,13 +15,23 @@ const NewAttendanceForm = ({
   onClose: () => void;
 }) => {
   const user = useAuthStore((state) => state.user) as Professor;
+  console.log('NewAttendanceForm - user:', user);
+
   const addAttendance = useAttendanceStore((state) => state.addAttendance);
-  const [batch, setBatch] = useState<BatchType>(user.batches.length > 0 ? user.batches[0] : '');
+  console.log('NewAttendanceForm - addAttendance:', addAttendance);
+
+  const [batch, setBatch] = useState<BatchType>(user?.batches?.length > 0 ? user.batches[0] : '');
+  console.log('NewAttendanceForm - initial batch:', batch);
+
   const [course, setCourse] = useState('');
+  console.log('NewAttendanceForm - initial course:', course);
+
   const [duration, setDuration] = useState('60');
+  console.log('NewAttendanceForm - initial duration:', duration);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('NewAttendanceForm - handleSubmit - batch:', batch);
 
     if (!batch) {
       alert('Please select a batch');
@@ -38,11 +48,13 @@ const NewAttendanceForm = ({
       status: 'active',
       students: [],
     };
+    console.log('NewAttendanceForm - handleSubmit - attendance:', attendance);
 
     try {
       await addAttendance(attendance);
       onClose();
     } catch (error) {
+      console.error('NewAttendanceForm - handleSubmit - error:', error);
       alert('Failed to create attendance record');
     }
   };
@@ -55,7 +67,10 @@ const NewAttendanceForm = ({
         </label>
         <Select
           value={batch}
-          onChange={(e) => setBatch(e.target.value as BatchType)}
+          onChange={(e) => {
+            setBatch(e.target.value as BatchType);
+            console.log('NewAttendanceForm - Select Batch - batch:', e.target.value);
+          }}
         >
           {user.batches.map((batch) => (
             <option key={batch} value={batch}>
@@ -72,7 +87,10 @@ const NewAttendanceForm = ({
         <Input
           required
           value={course}
-          onChange={(e) => setCourse(e.target.value)}
+          onChange={(e) => {
+            setCourse(e.target.value);
+            console.log('NewAttendanceForm - Course Name - course:', e.target.value);
+          }}
           placeholder="Enter course name"
         />
       </div>
@@ -83,7 +101,10 @@ const NewAttendanceForm = ({
         </label>
         <Select
           value={duration}
-          onChange={(e) => setDuration(e.target.value)}
+          onChange={(e) => {
+            setDuration(e.target.value);
+            console.log('NewAttendanceForm - Duration - duration:', e.target.value);
+          }}
         >
           <option value="60">1 hour</option>
           <option value="90">1.5 hours</option>
@@ -156,29 +177,44 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
 export const AttendanceManagement = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user) as Professor;
+  console.log('AttendanceManagement - user:', user);
+
   const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
+  console.log('AttendanceManagement - attendanceRecords:', attendanceRecords);
+
   const [showNewForm, setShowNewForm] = useState(false);
+  console.log('AttendanceManagement - showNewForm:', showNewForm);
 
   useEffect(() => {
     fetchAttendanceRecords();
+    console.log('AttendanceManagement - useEffect - fetchAttendanceRecords called');
   }, [fetchAttendanceRecords]);
 
   const userAttendance = attendanceRecords
     .filter((record) => record.professorId === user._id)
     .sort((a, b) => b.date.getTime() - a.date.getTime());
+  console.log('AttendanceManagement - userAttendance:', userAttendance);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
-          onClick={() => navigate('/professor')}
+          onClick={() => {
+            navigate('/professor');
+            console.log('AttendanceManagement - Back to Dashboard clicked');
+          }}
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
 
-        <Button onClick={() => setShowNewForm(true)}>
+        <Button
+          onClick={() => {
+            setShowNewForm(true);
+            console.log('AttendanceManagement - New Attendance clicked');
+          }}
+        >
           <Plus className="h-4 w-4 mr-2" />
           New Attendance
         </Button>
@@ -187,7 +223,10 @@ export const AttendanceManagement = () => {
       {showNewForm && (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Create New Attendance</h2>
-          <NewAttendanceForm onClose={() => setShowNewForm(false)} />
+          <NewAttendanceForm onClose={() => {
+            setShowNewForm(false);
+            console.log('AttendanceManagement - NewAttendanceForm onClose called');
+          }} />
         </div>
       )}
 
@@ -206,4 +245,4 @@ export const AttendanceManagement = () => {
   );
 };
 
-export default NewAttendanceForm;
+export default AttendanceManagement;
