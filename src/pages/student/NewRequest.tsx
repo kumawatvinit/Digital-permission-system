@@ -43,17 +43,29 @@ export const NewRequest = () => {
   const navigate = useNavigate();
   const addRequest = useRequestStore((state) => state.addRequest);
   const user = useAuthStore((state) => state.user);
+  console.log('NewRequest - user:', user);
+
   const [type, setType] = useState<typeof REQUEST_TYPES[number]['id']>('leave');
+  console.log('NewRequest - initial type:', type);
+
   const [title, setTitle] = useState('');
+  console.log('NewRequest - initial title:', title);
+
   const [content, setContent] = useState(TEMPLATES[type]);
+  console.log('NewRequest - initial content:', content);
+
   const [selectedProfessor, setSelectedProfessor] = useState('');
+  console.log('NewRequest - initial selectedProfessor:', selectedProfessor);
+
   const [professors, setProfessors] = useState<Professor[]>([]);
+  console.log('NewRequest - initial professors:', professors);
 
   useEffect(() => {
     const fetchProfessors = async () => {
       try {
         const response = await api.get('/users/professors');
         setProfessors(response.data);
+        console.log('NewRequest - fetchProfessors - response.data:', response.data);
       } catch (error) {
         console.error('Failed to fetch professors', error);
       }
@@ -64,6 +76,7 @@ export const NewRequest = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('NewRequest - handleSubmit - selectedProfessor:', selectedProfessor);
 
     // Validate professorId
     if (!selectedProfessor.match(/^[0-9a-fA-F]{24}$/)) {
@@ -80,11 +93,13 @@ export const NewRequest = () => {
       type,
       createdAt: new Date(),
     };
+    console.log('NewRequest - handleSubmit - request:', request);
 
     try {
       await addRequest(request);
       navigate('/student/request-status');
     } catch (error) {
+      console.error('NewRequest - handleSubmit - error:', error);
       alert('Failed to create request');
     }
   };
@@ -94,7 +109,10 @@ export const NewRequest = () => {
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => navigate('/student')}
+        onClick={() => {
+          navigate('/student');
+          console.log('NewRequest - Back to Dashboard clicked');
+        }}
       >
         <ChevronLeft className="h-4 w-4 mr-2" />
         Back to Dashboard
@@ -111,6 +129,8 @@ export const NewRequest = () => {
             onChange={(e) => {
               setType(e.target.value as typeof REQUEST_TYPES[number]['id']);
               setContent(TEMPLATES[e.target.value as typeof REQUEST_TYPES[number]['id']]);
+              console.log('NewRequest - Request Type - type:', e.target.value);
+              console.log('NewRequest - Request Type - content:', TEMPLATES[e.target.value as typeof REQUEST_TYPES[number]['id']]);
             }}
           >
             {REQUEST_TYPES.map((requestType) => (
@@ -128,7 +148,10 @@ export const NewRequest = () => {
           <Input
             required
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              console.log('NewRequest - Title - title:', e.target.value);
+            }}
             placeholder="Enter the title of your request"
           />
         </div>
@@ -140,7 +163,10 @@ export const NewRequest = () => {
           <textarea
             required
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              console.log('NewRequest - Application Content - content:', e.target.value);
+            }}
             className="w-full h-64 rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
             title="Application Content"
             placeholder="Write your application content here"
@@ -154,7 +180,10 @@ export const NewRequest = () => {
           <Select
             required
             value={selectedProfessor}
-            onChange={(e) => setSelectedProfessor(e.target.value)}
+            onChange={(e) => {
+              setSelectedProfessor(e.target.value);
+              console.log('NewRequest - Select Professor - selectedProfessor:', e.target.value);
+            }}
           >
             <option value="">Select a professor</option>
             {professors.map((prof) => (
