@@ -217,7 +217,7 @@ export const AttendanceManagement = () => {
 
   const userAttendance = attendanceRecords
     .filter((record) => record.professorId === professor._id)
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   console.log('AttendanceManagement - userAttendance:', userAttendance);
 
   return (

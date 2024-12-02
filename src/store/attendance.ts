@@ -7,8 +7,8 @@ interface AttendanceState {
   loading: boolean;
   error: string | null;
   fetchAttendanceRecords: () => Promise<void>;
-  addAttendance: (attendance: Attendance) => Promise<void>;
-  // updateAttendance: (id: string, updates: Partial<Attendance>) => Promise<void>;
+  addAttendance: (attendance: Omit<Attendance, '_id'>) => Promise<void>;
+  submitAttendance: (id: string, data: { status: 'present' | 'late' }) => Promise<void>;
   clearError: () => void;
 }
 
@@ -47,24 +47,24 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
     }
   },
 
-  // updateAttendance: async (id, updates) => {
-  //   set({ loading: true, error: null });
-  //   try {
-  //     const response = await attendance.update(id, updates);
-  //     set((state) => ({
-  //       attendanceRecords: state.attendanceRecords.map((record) =>
-  //         record._id === id ? { ...record, ...response.data } : record
-  //       ),
-  //       loading: false
-  //     }));
-  //   } catch (error) {
-  //     set({
-  //       error: error instanceof Error ? error.message : 'Failed to update attendance record',
-  //       loading: false
-  //     });
-  //     throw error;
-  //   }
-  // },
+  submitAttendance: async (id, data) => {
+    set({ loading: true, error: null });
+    try {
+      await attendance.submit(id, data);
+      set((state) => ({
+        attendanceRecords: state.attendanceRecords.map((record) =>
+          record._id === id ? { ...record, students: [...record.students, { studentId: data.studentId, status: data.status, submittedAt: new Date() }] } : record
+        ),
+        loading: false
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to submit attendance',
+        loading: false
+      });
+      throw error; // Re-throw for component handling
+    }
+  },
 
   clearError: () => set({ error: null })
 }));

@@ -1,36 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Bell } from 'lucide-react';
 import { format, isAfter, isBefore, addHours } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/auth';
+import { useAttendanceStore } from '../../store/attendance';
 import { Attendance } from '../../types';
-
-// Mock data - In a real app, this would come from an API
-const mockAttendance: Attendance[] = [
-  {
-    _id: '1',
-    batch: 'TYECO',
-    course: 'Digital Electronics',
-    professorId: 'prof1',
-    date: new Date(),
-    expiresAt: addHours(new Date(), 2),
-    status: 'active',
-    students: [],
-  },
-];
 
 const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
   const user = useAuthStore((state) => state.user);
+  const { submitAttendance } = useAttendanceStore();
   const [submitted, setSubmitted] = useState(false);
 
   const now = new Date();
   const isLate = isAfter(now, addHours(attendance.date, 1));
   const isExpired = isAfter(now, attendance.expiresAt);
 
-  const handleSubmit = (status: 'present' | 'late') => {
-    // In a real app, this would make an API call
-    setSubmitted(true);
+  const handleSubmit = async (status: 'present' | 'late') => {
+    try {
+      await submitAttendance(attendance._id, { status });
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Failed to submit attendance', error);
+      alert('Failed to submit attendance');
+    }
   };
 
   if (submitted) {
@@ -95,9 +88,14 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
 export const PendingTasks = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
+
+  useEffect(() => {
+    fetchAttendanceRecords();
+  }, [fetchAttendanceRecords]);
 
   // Filter attendance for user's batch
-  const pendingAttendance = mockAttendance.filter(
+  const pendingAttendance = attendanceRecords.filter(
     (a) => a.batch === (user as any).batch && !isAfter(new Date(), a.expiresAt)
   );
 
