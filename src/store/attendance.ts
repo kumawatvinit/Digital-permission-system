@@ -6,7 +6,8 @@ interface AttendanceState {
   attendanceRecords: Attendance[];
   loading: boolean;
   error: string | null;
-  fetchAttendanceRecords: () => Promise<void>;
+  fetchProfessorAttendanceRecords: () => Promise<void>;
+  fetchStudentAttendanceRecords: (batch: string) => Promise<void>;
   addAttendance: (attendance: Omit<Attendance, '_id'>) => Promise<void>;
   submitAttendance: (id: string, data: { status: 'present' | 'late' }) => Promise<void>;
   clearError: () => void;
@@ -17,10 +18,23 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
   loading: false,
   error: null,
 
-  fetchAttendanceRecords: async () => {
+  fetchProfessorAttendanceRecords: async () => {
     set({ loading: true, error: null });
     try {
       const response = await attendance.getProfessorRecords();
+      set({ attendanceRecords: response.data, loading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to fetch attendance records',
+        loading: false
+      });
+    }
+  },
+
+  fetchStudentAttendanceRecords: async (batch) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await attendance.getStudentRecords(batch);
       set({ attendanceRecords: response.data, loading: false });
     } catch (error) {
       set({

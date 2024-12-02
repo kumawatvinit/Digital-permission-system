@@ -88,11 +88,13 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
 export const PendingTasks = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
+  const { attendanceRecords, fetchStudentAttendanceRecords } = useAttendanceStore();
 
   useEffect(() => {
-    fetchAttendanceRecords();
-  }, [fetchAttendanceRecords]);
+    if (user && user.role === 'student') {
+      fetchStudentAttendanceRecords((user as any).batch);
+    }
+  }, [fetchStudentAttendanceRecords, user]);
 
   // Filter attendance for user's batch
   const pendingAttendance = attendanceRecords.filter(
