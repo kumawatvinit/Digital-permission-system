@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Download, Plus } from 'lucide-react';
-import { format, addHours } from 'date-fns';
+import { format, addHours, differenceInMinutes, isAfter } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
@@ -137,9 +137,10 @@ const NewAttendanceForm = ({
 const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
   const downloadReport = () => {
     // Create CSV content
-    const headers = ['Student ID', 'Status', 'Submission Time'];
+    const headers = ['Student ID', 'Student Name', 'Status', 'Submission Time'];
     const rows = attendance.students.map((student) => [
-      student.studentId,
+      student.studentId._id,
+      student.studentId.name,
       student.status,
       student.submittedAt ? format(student.submittedAt, 'MMM d, yyyy HH:mm:ss') : 'N/A',
     ]);
@@ -159,6 +160,10 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
     a.click();
     document.body.removeChild(a);
   };
+
+  const now = new Date();
+  const isExpired = isAfter(now, attendance.expiresAt);
+  const duration = differenceInMinutes(attendance.expiresAt, attendance.date);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
@@ -180,7 +185,11 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
       </div>
 
       <div className="text-sm text-gray-600">
-        Status: {attendance.status === 'active' ? 'Active' : 'Not Active'}
+        Status: {isExpired ? 'Expired' : 'Active'}
+      </div>
+
+      <div className="text-sm text-gray-600">
+        Duration: {duration} minutes
       </div>
     </div>
   );

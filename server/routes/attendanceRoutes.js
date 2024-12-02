@@ -23,7 +23,7 @@ router.post('/', auth, roleAuth(['professor']), validate(attendanceValidationRul
 // Get professor's attendance records
 router.get('/professor', auth, roleAuth(['professor']), async (req, res) => {
   try {
-    const records = await Attendance.find({ professorId: req.user._id });
+    const records = await Attendance.find({ professorId: req.user._id }).populate('students.studentId', 'name');
     res.json(records);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -36,7 +36,7 @@ router.get('/student/:batch', auth, roleAuth(['student']), async (req, res) => {
     const records = await Attendance.find({ 
       batch: req.params.batch,
       status: 'active',
-    });
+    }).populate('students.studentId', 'name');
     res.json(records);
   } catch (error) {
     res.status(500).json({ message: error.message });
