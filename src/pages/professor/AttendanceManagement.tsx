@@ -120,7 +120,6 @@ const NewAttendanceForm = ({
           }}
         >
           <option value="60">1 hour</option>
-          <option value="90">1.5 hours</option>
           <option value="120">2 hours</option>
         </Select>
       </div>
