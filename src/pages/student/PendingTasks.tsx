@@ -95,6 +95,9 @@ export const PendingTasks = () => {
       fetchStudentAttendanceRecords((user as any).batch);
       console.log("Attendance fetched inside: ", attendanceRecords);
     }
+
+    console.log("Attendance fetched but did not go inside: ", attendanceRecords);
+    
   }, [fetchStudentAttendanceRecords, user]);
   
   console.log("Attendance fetched : ", attendanceRecords);
