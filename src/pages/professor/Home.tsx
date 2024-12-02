@@ -38,7 +38,7 @@ export const ProfessorHome = () => {
           </Button>
         </Link>
 
-        <Link to="/professor/misc">
+        {/* <Link to="/professor/misc">
           <Button
             variant="outline"
             className="w-full h-32 flex flex-col items-center justify-center gap-2"
@@ -46,7 +46,7 @@ export const ProfessorHome = () => {
             <MessageSquare className="h-8 w-8 text-blue-600" />
             <span>Miscellaneous Posts</span>
           </Button>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

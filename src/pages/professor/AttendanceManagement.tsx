@@ -204,16 +204,16 @@ export const AttendanceManagement = () => {
   const professor = user as Professor;
   console.log('AttendanceManagement - user:', professor);
 
-  const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
+  const { attendanceRecords, fetchProfessorAttendanceRecords } = useAttendanceStore();
   console.log('AttendanceManagement - attendanceRecords:', attendanceRecords);
 
   const [showNewForm, setShowNewForm] = useState(false);
   console.log('AttendanceManagement - showNewForm:', showNewForm);
 
   useEffect(() => {
-    fetchAttendanceRecords();
-    console.log('AttendanceManagement - useEffect - fetchAttendanceRecords called');
-  }, [fetchAttendanceRecords]);
+    fetchProfessorAttendanceRecords();
+    console.log('AttendanceManagement - useEffect - fetchProfessorAttendanceRecords called');
+  }, [fetchProfessorAttendanceRecords]);
 
   const userAttendance = attendanceRecords
     .filter((record) => record.professorId === professor._id)
