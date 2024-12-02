@@ -98,8 +98,10 @@ export const PendingTasks = () => {
   }, [fetchStudentAttendanceRecords, user]);
 
   useEffect(() => {
+    console.log("Fetched attendances: ", attendanceRecords)
+
     const filteredAttendance = attendanceRecords.filter(
-      (a) => a.batch === (user as any).batch && !isAfter(new Date(), a.expiresAt)
+      (a) => a.batch === (user as any).batch
     );
     setPendingAttendance(filteredAttendance);
     console.log('PendingTasks - pendingAttendance:', filteredAttendance);
