@@ -65,12 +65,12 @@ const RequestStages = ({ request }: { request: Request }) => {
 export const RequestStatus = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const { requests = [], fetchRequests } = useRequestStore();
+  const { requests = [], fetchStudentRequests } = useRequestStore();
   const [filter, setFilter] = useState<Request['status'] | 'all'>('all');
 
   useEffect(() => {
-    fetchRequests();
-  }, [fetchRequests]);
+    fetchStudentRequests();
+  }, [fetchStudentRequests]);
 
   const userRequests = requests
     .filter((request) => request.studentId._id === user?._id)

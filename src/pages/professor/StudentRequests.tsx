@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
@@ -28,7 +28,6 @@ const RequestCard = ({ request }: { request: Request }) => {
     if (request.professorApproval?.status !== 'approved') {
       return;
     }
-    
     updateRequest(request._id, {
       status: 'forwarded',
     });
@@ -108,14 +107,18 @@ const RequestCard = ({ request }: { request: Request }) => {
 export const StudentRequests = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const requests = useRequestStore((state) => state.requests);
+  const { requests = [], fetchProfessorRequests } = useRequestStore();
   const [filter, setFilter] = useState<Request['status'] | 'all'>('all');
+
+  useEffect(() => {
+    fetchProfessorRequests();
+  }, [fetchProfessorRequests]);
 
   const filteredRequests = requests
     .filter((request) => request.professorId === user?._id)
     .filter((request) => filter === 'all' || request.status === filter)
     .filter((request) => request.status !== 'forwarded')
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="space-y-6">
