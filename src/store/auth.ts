@@ -1,6 +1,6 @@
 import create from 'zustand';
 import { auth } from '../api';
-import { User } from '../types'; // Adjust the import path as necessary
+import { User, Student, Professor } from '../types'; // Adjust the import path as necessary
 
 interface AuthState {
   user: User | null;
@@ -16,8 +16,6 @@ export const useAuthStore = create<AuthState>((set) => {
   let user: User | null = null;
 
   if (token) {
-    // Optionally, you can make an API call to fetch the user details using the token
-    // For simplicity, we'll assume the user details are stored in localStorage as well
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       user = JSON.parse(storedUser);

@@ -16,16 +16,20 @@ const NewAttendanceForm = ({
 }) => {
   const user = useAuthStore((state) => state.user) as Professor;
   const addAttendance = useAttendanceStore((state) => state.addAttendance);
-  const [batch, setBatch] = useState<BatchType>(user.batches[0]);
+  const [batch, setBatch] = useState<BatchType>(user.batches.length > 0 ? user.batches[0] : '');
   const [course, setCourse] = useState('');
   const [duration, setDuration] = useState('60');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!batch) {
+      alert('Please select a batch');
+      return;
+    }
+
     const now = new Date();
-    const attendance: Attendance = {
-      _id: '', // Generate or assign a unique ID here
+    const attendance: Omit<Attendance, '_id'> = {
       batch,
       course,
       professorId: user._id,
@@ -201,3 +205,5 @@ export const AttendanceManagement = () => {
     </div>
   );
 };
+
+export default NewAttendanceForm;
