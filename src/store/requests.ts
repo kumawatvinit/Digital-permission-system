@@ -4,20 +4,30 @@ import { Request } from '../types';
 
 interface RequestState {
   requests: Request[];
-  fetchRequests: () => Promise<void>;
-  addRequest: (request: Request) => Promise<void>;
+  fetchStudentRequests: () => Promise<void>;
+  fetchProfessorRequests: () => Promise<void>;
+  addRequest: (request: Omit<Request, '_id'>) => Promise<void>;
   updateRequest: (id: string, updates: Partial<Request>) => Promise<void>;
 }
 
 export const useRequestStore = create<RequestState>((set) => ({
   requests: [],
   
-  fetchRequests: async () => {
+  fetchStudentRequests: async () => {
     try {
       const response = await requests.getStudentRequests();
-      set({ requests: response.data });
+      set({ requests: response.data.requests });
     } catch (error) {
-      console.error('Failed to fetch requests', error);
+      console.error('Failed to fetch student requests', error);
+    }
+  },
+
+  fetchProfessorRequests: async () => {
+    try {
+      const response = await requests.getProfessorRequests();
+      set({ requests: response.data.requests });
+    } catch (error) {
+      console.error('Failed to fetch professor requests', error);
     }
   },
 

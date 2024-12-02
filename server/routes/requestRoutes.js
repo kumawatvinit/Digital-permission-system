@@ -22,14 +22,45 @@ router.post('/', auth, roleAuth(['student']), validate(requestValidationRules.cr
   }
 });
 
-// Get requests with pagination and filters
-router.get('/:role', auth, async (req, res) => {
+// Get student requests
+router.get('/student', auth, roleAuth(['student']), async (req, res) => {
   try {
-    const { role } = req.params;
     const { page = 1, limit = 10, status, type } = req.query;
 
     const query = {
-      ...(role === 'student' ? { studentId: req.user._id } : { professorId: req.user._id }),
+      studentId: req.user._id,
+      ...(status && status !== 'all' ? { status } : {}),
+      ...(type ? { type } : {})
+    };
+
+    const total = await Request.countDocuments(query);
+    const requests = await Request.find(query)
+      .populate('studentId', 'name email batch')
+      .populate('professorId', 'name email')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      requests,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get professor requests
+router.get('/professor', auth, roleAuth(['professor']), async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status, type } = req.query;
+
+    const query = {
+      professorId: req.user._id,
       ...(status && status !== 'all' ? { status } : {}),
       ...(type ? { type } : {})
     };

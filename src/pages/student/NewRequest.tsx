@@ -124,13 +124,11 @@ export const NewRequest = () => {
             Request Type
           </label>
           <Select
-            required
             value={type}
             onChange={(e) => {
               setType(e.target.value as typeof REQUEST_TYPES[number]['id']);
               setContent(TEMPLATES[e.target.value as typeof REQUEST_TYPES[number]['id']]);
               console.log('NewRequest - Request Type - type:', e.target.value);
-              console.log('NewRequest - Request Type - content:', TEMPLATES[e.target.value as typeof REQUEST_TYPES[number]['id']]);
             }}
           >
             {REQUEST_TYPES.map((requestType) => (
@@ -152,7 +150,7 @@ export const NewRequest = () => {
               setTitle(e.target.value);
               console.log('NewRequest - Title - title:', e.target.value);
             }}
-            placeholder="Enter the title of your request"
+            placeholder="Enter request title"
           />
         </div>
 
