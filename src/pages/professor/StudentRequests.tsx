@@ -115,11 +115,11 @@ export const StudentRequests = () => {
   }, [fetchProfessorRequests]);
 
   const filteredRequests = requests
-    .filter((request) => request.professorId === user?._id)
-    .filter((request) => filter === 'all' || request.status === filter)
-    .filter((request) => request.status !== 'forwarded')
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  
+  // .filter((request) => request.professorId === user?._id)
+  // .filter((request) => filter === 'all' || request.status === filter)
+  // .filter((request) => request.status !== 'forwarded')
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
