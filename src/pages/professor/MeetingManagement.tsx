@@ -30,7 +30,6 @@ const MeetingForm = ({
     e.preventDefault();
     
     const meeting = {
-      _id: initialData?._id || Date.now().toString(),
       ...formData,
       date: parseISO(formData.date),
       professorId: user._id,

@@ -5,8 +5,8 @@ import { Meeting } from '../types';
 interface MeetingState {
   meetings: Meeting[];
   fetchMeetings: () => Promise<void>;
-  addMeeting: (meeting: Meeting) => Promise<void>;
-  updateMeeting: (id: string, updates: Meeting) => Promise<void>;
+  addMeeting: (meeting: Omit<Meeting, '_id'>) => Promise<void>;
+  updateMeeting: (id: string, updates: Partial<Meeting>) => Promise<void>;
   deleteMeeting: (id: string) => Promise<void>;
 }
 
