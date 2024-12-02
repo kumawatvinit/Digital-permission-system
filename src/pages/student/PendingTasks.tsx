@@ -89,24 +89,21 @@ export const PendingTasks = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const { attendanceRecords, fetchStudentAttendanceRecords } = useAttendanceStore();
+  const [pendingAttendance, setPendingAttendance] = useState<Attendance[]>([]);
 
   useEffect(() => {
     if (user && user.role === 'student') {
       fetchStudentAttendanceRecords((user as any).batch);
-      console.log("Attendance fetched inside: ", attendanceRecords);
     }
-
-    console.log("Attendance fetched but did not go inside: ", attendanceRecords);
-    
   }, [fetchStudentAttendanceRecords, user]);
-  
-  console.log("Attendance fetched : ", attendanceRecords);
-  // Filter attendance for user's batch
-  const pendingAttendance = attendanceRecords.filter(
-    (a) => a.batch === (user as any).batch && !isAfter(new Date(), a.expiresAt)
-  );
 
-  console.log('PendingTasks - pendingAttendance:', pendingAttendance);
+  useEffect(() => {
+    const filteredAttendance = attendanceRecords.filter(
+      (a) => a.batch === (user as any).batch && !isAfter(new Date(), a.expiresAt)
+    );
+    setPendingAttendance(filteredAttendance);
+    console.log('PendingTasks - pendingAttendance:', filteredAttendance);
+  }, [attendanceRecords, user]);
 
   return (
     <div className="space-y-6">
