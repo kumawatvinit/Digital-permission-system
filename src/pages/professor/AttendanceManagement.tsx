@@ -185,13 +185,14 @@ export const AttendanceManagement = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   console.log('AttendanceManagement - user:', user);
-
-  if (!user || user.role !== 'professor' || !('batches' in user)) {
-    console.error('AttendanceManagement - user is not a professor or does not have batches');
+  
+  if (!user || user.role !== 'professor') {
+    console.error('AttendanceManagement - user is not a professor or null');
     return <div>Error: User is not a professor or does not have batches</div>;
   }
-
+  
   const professor = user as Professor;
+  console.log('AttendanceManagement - user:', professor);
 
   const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
   console.log('AttendanceManagement - attendanceRecords:', attendanceRecords);
