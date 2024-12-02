@@ -14,13 +14,20 @@ const NewAttendanceForm = ({
 }: {
   onClose: () => void;
 }) => {
-  const user = useAuthStore((state) => state.user) as Professor;
+  const user = useAuthStore((state) => state.user);
   console.log('NewAttendanceForm - user:', user);
+
+  if (!user || user.role !== 'professor' || !('batches' in user)) {
+    console.error('NewAttendanceForm - user is not a professor or does not have batches');
+    return null;
+  }
+
+  const professor = user as Professor;
 
   const addAttendance = useAttendanceStore((state) => state.addAttendance);
   console.log('NewAttendanceForm - addAttendance:', addAttendance);
 
-  const [batch, setBatch] = useState<BatchType>(user?.batches?.length > 0 ? user.batches[0] : '');
+  const [batch, setBatch] = useState<BatchType>(professor.batches.length > 0 ? professor.batches[0] : '');
   console.log('NewAttendanceForm - initial batch:', batch);
 
   const [course, setCourse] = useState('');
@@ -42,7 +49,7 @@ const NewAttendanceForm = ({
     const attendance: Omit<Attendance, '_id'> = {
       batch,
       course,
-      professorId: user._id,
+      professorId: professor._id,
       date: now,
       expiresAt: addHours(now, parseInt(duration) / 60),
       status: 'active',
@@ -72,7 +79,7 @@ const NewAttendanceForm = ({
             console.log('NewAttendanceForm - Select Batch - batch:', e.target.value);
           }}
         >
-          {user.batches.map((batch) => (
+          {professor.batches.map((batch) => (
             <option key={batch} value={batch}>
               {batch}
             </option>
@@ -176,8 +183,15 @@ const AttendanceCard = ({ attendance }: { attendance: Attendance }) => {
 
 export const AttendanceManagement = () => {
   const navigate = useNavigate();
-  const user = useAuthStore((state) => state.user) as Professor;
+  const user = useAuthStore((state) => state.user);
   console.log('AttendanceManagement - user:', user);
+
+  if (!user || user.role !== 'professor' || !('batches' in user)) {
+    console.error('AttendanceManagement - user is not a professor or does not have batches');
+    return <div>Error: User is not a professor or does not have batches</div>;
+  }
+
+  const professor = user as Professor;
 
   const { attendanceRecords, fetchAttendanceRecords } = useAttendanceStore();
   console.log('AttendanceManagement - attendanceRecords:', attendanceRecords);
@@ -191,7 +205,7 @@ export const AttendanceManagement = () => {
   }, [fetchAttendanceRecords]);
 
   const userAttendance = attendanceRecords
-    .filter((record) => record.professorId === user._id)
+    .filter((record) => record.professorId === professor._id)
     .sort((a, b) => b.date.getTime() - a.date.getTime());
   console.log('AttendanceManagement - userAttendance:', userAttendance);
 
