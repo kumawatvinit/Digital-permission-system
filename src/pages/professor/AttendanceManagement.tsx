@@ -8,6 +8,7 @@ import { Select } from '../../components/ui/Select';
 import { useAuthStore } from '../../store/auth';
 import { useAttendanceStore } from '../../store/attendance';
 import { BatchType, Professor, Attendance } from '../../types';
+import { BATCH_OPTIONS } from '../../lib/utils';
 
 const NewAttendanceForm = ({
   onClose,
@@ -17,9 +18,14 @@ const NewAttendanceForm = ({
   const user = useAuthStore((state) => state.user);
   console.log('NewAttendanceForm - user:', user);
 
-  if (!user || user.role !== 'professor' || !('batches' in user)) {
+  if (!user || user.role !== 'professor') {
     console.error('NewAttendanceForm - user is not a professor or does not have batches');
     return null;
+  }
+
+  // Manually add batches if missing
+  if (!('batches' in user)) {
+    (user as Professor).batches = BATCH_OPTIONS;
   }
 
   const professor = user as Professor;
@@ -185,12 +191,17 @@ export const AttendanceManagement = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   console.log('AttendanceManagement - user:', user);
-  
+
   if (!user || user.role !== 'professor') {
     console.error('AttendanceManagement - user is not a professor or null');
     return <div>Error: User is not a professor or does not have batches</div>;
   }
-  
+
+  // Manually add batches if missing
+  if (!('batches' in user)) {
+    (user as Professor).batches = BATCH_OPTIONS;
+  }
+
   const professor = user as Professor;
   console.log('AttendanceManagement - user:', professor);
 
